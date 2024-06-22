@@ -3,7 +3,7 @@ create table auth
 	uuid uuid,
 	user_uuid uuid,
 	access_token text,
-	expire date
+	expire timestamp with time zone
 );
 
 create table users
@@ -23,7 +23,7 @@ create table equipment_list
 	uuid uuid
 		constraint equipment_list_pk
 			unique,
-	ip_adress text,
+	ip_address text,
 	description text
 );
 
@@ -34,7 +34,7 @@ create table terminal_list
 		references equipment_list (uuid),
 	mac text,
 	model text,
-	dt_created date,
-	dt_last_pool date
+	dt_created timestamp with time zone,
+	dt_last_pool timestamp with time zone default null
 );
 
