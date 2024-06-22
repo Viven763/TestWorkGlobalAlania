@@ -5,7 +5,9 @@ from users.router import users_router
 from equipment.router import equipment_router
 from terminal.router import terminal_router
 
-app = FastAPI(title="TestWorkGlobalAlania")
+app = FastAPI(title="TestWorkGlobalAlania",
+              description="Тестовое задание",
+              version="1.1.0")
 
 app.add_middleware(
     CORSMiddleware,

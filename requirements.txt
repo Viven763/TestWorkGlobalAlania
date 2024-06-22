@@ -6,3 +6,4 @@ pytz
 pydantic
 bcrypt
 authlib
+websockets

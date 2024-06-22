@@ -10,6 +10,20 @@ async def insert_equipment(ip_address: str, desc: str) -> dict:
     finally:
         await conn.close()
 
+async def delete_equipment(equipment_uuid: str) -> dict:
+    conn = await asyncpg.connect()
+    try:
+        await conn.execute("DELETE FROM terminal_list WHERE device_uuid = $1",
+                           uuid.UUID(equipment_uuid))
+        data = await conn.execute("DELETE FROM equipment_list WHERE uuid = $1",
+                                  uuid.UUID(equipment_uuid))
+        if int(data.split(" ")[-1]) == 0:
+            return {"error": "equipment not found"}
+        return {"message": "success"}
+    except ValueError:
+        return {"error": "incorrect UUID"}
+    finally:
+        await conn.close()
 async def get_equipment_list() -> list:
     conn = await asyncpg.connect()
     try:

@@ -15,6 +15,22 @@ async def add_terminal(device_uuid: str, mac_address: str, model: str) -> dict:
     finally:
         await conn.close()
 
+async def get_terminal_list() -> list:
+    conn = await asyncpg.connect()
+    try:
+        data = await conn.fetch("SELECT * FROM terminal_list")
+        json_data = [{
+            "uuid": str(terminal['uuid']),
+            "device_uuid": str(terminal['device_uuid']),
+            "mac_address": terminal['mac'],
+            "model": terminal['model'],
+            "create_date": terminal['dt_created'],
+            "last_pool_date": terminal['dt_last_pool']
+        } for terminal in data]
+        return json_data
+    finally:
+        await conn.close()
+
 async def delete_terminal(terminal_uuid: str) -> dict:
     conn = await asyncpg.connect()
     try:

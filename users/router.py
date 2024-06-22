@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, WebSocketException
+from websockets.exceptions import ConnectionClosed
+import asyncio
 from auth.utils import jwt_auth
 from utils.database import users
 import bcrypt
@@ -10,6 +12,17 @@ users_router = APIRouter(tags=['users'], prefix='/users')
 async def list_users(user: dict = Depends(jwt_auth.login_required)) -> list:
     return await users.get_users_list()
 
+@users_router.websocket('/ws/list')
+async def websocket_list(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await users.get_users_list()
+            await websocket.send_json(data)
+            await asyncio.sleep(1)
+    except (ConnectionClosed, WebSocketException, WebSocketDisconnect):
+        await websocket.close()
+
 @users_router.post('/register')
 async def register(user: Register) -> dict:
     hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
@@ -17,8 +30,8 @@ async def register(user: Register) -> dict:
     return await users.register_user(user.login, user.password, user.fio)
 
 @users_router.post('/add')
-async def create_user(register: Register, user: dict = Depends(jwt_auth.login_required)) -> dict:
-    return await users.register_user(register.login, register.password, register.fio)
+async def create_user(user_data: Register, user: dict = Depends(jwt_auth.login_required)) -> dict:
+    return await users.register_user(user_data.login, user_data.password, user_data.fio)
 
 @users_router.patch('/update')
 async def update_user_data(patch_data: PatchUserData, user: dict = Depends(jwt_auth.login_required)) -> dict:
