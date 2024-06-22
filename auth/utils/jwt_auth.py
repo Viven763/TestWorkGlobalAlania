@@ -29,9 +29,14 @@ def get_current_user(token: JwtAuthorizationCredentials = Security(security)):
                              headers={'WWW-Authenticate': 'Bearer'})
     return token.subject
 
-def login_required(user: Auth = Depends(get_current_user)) -> Auth:
-    if user is None:
+async def login_required(user: Auth = Depends(get_current_user)) -> dict:
+    user_data = await users.get_current_user(user['login'])
+    if user_data is None:
         raise HTTPException(status_code=403,
                              detail="Incorrect username or password",
                              headers={'WWW-Authenticate': 'Bearer'})
-    return user
+    if user_data['status'] == 3:
+        raise HTTPException(status_code=403,
+                            detail="Access denied",
+                            headers={'WWW-Authenticate': 'Bearer'})
+    return user_data
