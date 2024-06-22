@@ -20,9 +20,7 @@ create table users
 
 create table equipment_list
 (
-	uuid uuid
-		constraint equipment_list_pk
-			unique,
+	uuid uuid unique not null,
 	ip_address text,
 	description text
 );

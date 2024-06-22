@@ -11,6 +11,7 @@ services:
       - .env
     restart: always
   db:
+    container_name: "Global_Alania-DB"
     image: postgres:latest
     environment:
       POSTGRES_USER: ${PGUSER}
